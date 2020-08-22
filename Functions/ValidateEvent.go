@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
+func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string {
 	var correlationRecord = QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
 
 	if correlationRecord == nil {
 		log.Fatal("Correlation query failed. ")
-		return
+		return ""
 	}
 
 	if *correlationRecord.Count > 0 {
 		//we have seen this record before, ignore it
-		return
+		return ""
 	}
 
 	var correlationRecordToInsert = Struct.CorrelationTableRecord{CUSTOMER_ID: event.CustomerID, EVENT_ID: event.EventID}
@@ -31,7 +31,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if timestampParseError != nil {
 		log.Fatal(timestampParseError)
-		return
+		return ""
 	}
 
 	var extractedEventDate = eventTime.Format("2006-01-02")
@@ -44,7 +44,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if loadTableRecords == nil {
 		log.Fatal("Load  table query failed. ")
-		return
+		return ""
 	}
 
 	var currentAcceptedDailyLoadAmount = 0.0
@@ -59,14 +59,14 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 		if unmarshalError != nil {
 			log.Fatal(unmarshalError)
-			return
+			return ""
 		}
 
 		var dailyLoadAmount, parseError = strconv.ParseFloat(item.DAILY_LOAD_AMOUNT, 64)
 
 		if parseError != nil {
 			log.Fatal(parseError)
-			return
+			return ""
 		}
 
 		currentAcceptedWeeklyLoadAmount = currentAcceptedWeeklyLoadAmount + dailyLoadAmount
@@ -77,7 +77,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 			currentAcceptedDailyLoads, parseError = strconv.Atoi(item.NUMBER_OF_LOADS)
 			if parseError != nil {
 				log.Fatal(parseError)
-				return
+				return ""
 			}
 		}
 
@@ -87,7 +87,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if parseError != nil {
 		log.Fatal(parseError)
-		return
+		return ""
 	}
 
 	var newDailyLoadAmount = currentAcceptedDailyLoadAmount + eventLoadAmount
@@ -96,8 +96,9 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	//check new daily/weekly amounts
 	if newDailyLoadAmount > 5000.00 || newDailyLoads > 3 || newWeeklyLoadAmount > 20000.00 {
-		log.Println(GenerateOutputRecord(event, false))
-		return
+		var outputRecord = GenerateOutputRecord(event, false)
+		log.Println(outputRecord)
+		return outputRecord
 	}
 
 	//this is an accepted event
@@ -108,6 +109,8 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	InsertLoadTableRecord(dynamoDBClient, "DailyCustomerLoadTable", loadRecordToInsert)
 
-	log.Println(GenerateOutputRecord(event, true))
+	var outputRecord = GenerateOutputRecord(event, true)
+	log.Println(outputRecord)
+	return outputRecord
 
 }

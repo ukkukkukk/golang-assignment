@@ -38,6 +38,12 @@ func main() {
 		return
 	}
 
+	var outputFile, fileCreateError = os.Create("programOutput.txt")
+	if fileCreateError != nil {
+		log.Fatal(fileCreateError)
+		return
+	}
+
 	var fileScanner = bufio.NewScanner(inputFile)
 
 	var linesProcessed = 0
@@ -53,7 +59,16 @@ func main() {
 			return
 		}
 
-		Functions.ValidateEvent(dynamoDBClient, event)
+		var output = Functions.ValidateEvent(dynamoDBClient, event)
+
+		if output != "" {
+			var _, writeToFileError = outputFile.WriteString(output + "\n")
+
+			if writeToFileError != nil {
+				log.Fatal(writeToFileError)
+				return
+			}
+		}
 
 		//log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
 		linesProcessed++
@@ -68,6 +83,11 @@ func main() {
 	}
 
 	var fileCloseError = inputFile.Close()
+	if fileCloseError != nil {
+		log.Fatal(fileCloseError)
+	}
+
+	fileCloseError = outputFile.Close()
 	if fileCloseError != nil {
 		log.Fatal(fileCloseError)
 	}
