@@ -52,8 +52,8 @@ func main() {
 			log.Fatal(jsonParseError)
 			return
 		}
-		Functions.QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
-		Functions.QueryCustomerLoadTable(dynamoDBClient, "DailyCustomerLoadTable", event.CustomerID, event.EventTime, event.EventTime)
+
+		Functions.ValidateEvent(dynamoDBClient, event)
 
 		log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
 		linesProcessed++

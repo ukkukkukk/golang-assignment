@@ -1,13 +1,12 @@
 package Functions
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 )
 
-func QueryEventCorrelationTable(dynamoDBClient *dynamodb.DynamoDB, tableName string, hashKeyValue string, rangeKeyValue string) {
+func QueryEventCorrelationTable(dynamoDBClient *dynamodb.DynamoDB, tableName string, hashKeyValue string, rangeKeyValue string) *dynamodb.QueryOutput {
 
 	var queryParam = &dynamodb.QueryInput{
 		TableName:              aws.String(tableName),
@@ -26,13 +25,12 @@ func QueryEventCorrelationTable(dynamoDBClient *dynamodb.DynamoDB, tableName str
 		},
 	}
 
-	resp, queryError := dynamoDBClient.Query(queryParam)
+	var queryResults, queryError = dynamoDBClient.Query(queryParam)
 	if queryError != nil {
 		log.Fatal(queryError)
-		return
+		return nil
 	}
 
-	fmt.Println(queryParam)
-	fmt.Println(resp)
+	return queryResults
 
 }
