@@ -19,7 +19,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if *correlationRecord.Count > 0 {
 		//we have seen this record before, output false
-
+		log.Println(GenerateOutputRecord(event, false))
 		return
 	}
 
