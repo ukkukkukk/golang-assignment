@@ -6,8 +6,8 @@ import (
 	"log"
 )
 
-func GenerateRejectedRecord(event Struct.Event) string {
-	var rejectedOutput = Struct.OutputEvent{CustomerID: event.CustomerID, EventID: event.EventID, Accepted: "false"}
+func GenerateOutputRecord(event Struct.Event, accepted bool) string {
+	var rejectedOutput = Struct.OutputEvent{CustomerID: event.CustomerID, EventID: event.EventID, Accepted: accepted}
 	rejectedOutputJSON, jsonParseError := json.Marshal(rejectedOutput)
 
 	if jsonParseError != nil {

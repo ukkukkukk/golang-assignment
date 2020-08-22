@@ -44,7 +44,7 @@ func main() {
 
 	for fileScanner.Scan() {
 		var eventJSON = fileScanner.Text()
-		log.Printf(eventJSON)
+		//log.Printf(eventJSON)
 		var event Struct.Event
 		var jsonParseError = json.Unmarshal([]byte(eventJSON), &event)
 
@@ -55,7 +55,7 @@ func main() {
 
 		Functions.ValidateEvent(dynamoDBClient, event)
 
-		log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
+		//log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
 		linesProcessed++
 	}
 

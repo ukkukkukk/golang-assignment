@@ -1,7 +1,6 @@
 package Functions
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"golang-assignment/Struct"
@@ -20,7 +19,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if *correlationRecord.Count > 0 {
 		//we have seen this record before, output false
-		log.Println(GenerateRejectedRecord(event))
+
 		return
 	}
 
@@ -95,11 +94,20 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	//check new daily/weekly amounts
 	if newDailyLoadAmount > 5000.00 || newDailyLoads > 3 || newWeeklyLoadAmount > 20000.00 {
-		log.Println(GenerateRejectedRecord(event))
+		log.Println(GenerateOutputRecord(event, false))
 		return
 	}
 
-	fmt.Println(correlationRecord)
-	fmt.Println(loadTableRecords)
+	//this is an accepted event
+
+	var correlationRecordToInsert = Struct.CorrelationTableRecord{CUSTOMER_ID: event.CustomerID, EVENT_ID: event.EventID}
+	var convertedNewDailyAmount = strconv.FormatFloat(newDailyLoadAmount, 'f', 2, 64)
+	var convertedNewDailyLoads = strconv.Itoa(newDailyLoads)
+	var loadRecordToInsert = Struct.LoadTableRecord{CUSTOMER_ID: event.CustomerID, DATE: extractedEventDate, DAILY_LOAD_AMOUNT: convertedNewDailyAmount, NUMBER_OF_LOADS: convertedNewDailyLoads}
+
+	InsertCorrelationTableRecord(dynamoDBClient, "EventCorrelationTable", correlationRecordToInsert)
+	InsertLoadTableRecord(dynamoDBClient, "DailyCustomerLoadTable", loadRecordToInsert)
+
+	log.Println(GenerateOutputRecord(event, true))
 
 }
