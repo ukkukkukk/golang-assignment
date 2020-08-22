@@ -12,12 +12,12 @@ import (
 func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 	var correlationRecord = QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
 
-	if(correlationRecord == nil) {
+	if correlationRecord == nil {
 		log.Fatal("Correlation query failed. ")
 		return
 	}
 
-	if(*correlationRecord.Count > 0) {
+	if *correlationRecord.Count > 0 {
 		//we have seen this record before, output false
 		var rejectedOutput = Struct.OutputEvent{CustomerID: event.CustomerID, EventID: event.EventID, Accepted: "false"}
 		rejectedOutputJSON, jsonParseError := json.Marshal(rejectedOutput)
@@ -35,15 +35,18 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	if timestampParseError != nil {
 		log.Fatal(timestampParseError)
+		return
 	}
 
 	var extractedEventDate = eventTime.Format("2006-01-02")
 
 	//find date for start of week
 
-	var loadTableRecords = QueryCustomerLoadTable(dynamoDBClient, "DailyCustomerLoadTable", event.CustomerID, extractedEventDate, extractedEventDate)
+	var extractedStartOfWeek = FindStartOfWeek(eventTime)
 
-	if(loadTableRecords == nil) {
+	var loadTableRecords = QueryCustomerLoadTable(dynamoDBClient, "DailyCustomerLoadTable", event.CustomerID, extractedStartOfWeek, extractedEventDate)
+
+	if loadTableRecords == nil {
 		log.Fatal("Load  table query failed. ")
 		return
 	}
