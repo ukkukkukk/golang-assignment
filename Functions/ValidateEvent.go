@@ -18,10 +18,12 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 	}
 
 	if *correlationRecord.Count > 0 {
-		//we have seen this record before, output false
-		log.Println(GenerateOutputRecord(event, false))
+		//we have seen this record before, ignore it
 		return
 	}
+
+	var correlationRecordToInsert = Struct.CorrelationTableRecord{CUSTOMER_ID: event.CustomerID, EVENT_ID: event.EventID}
+	InsertCorrelationTableRecord(dynamoDBClient, "EventCorrelationTable", correlationRecordToInsert)
 
 	//extract date from dateTime
 	var layout = "2006-01-02T15:04:05Z"
@@ -100,12 +102,12 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	//this is an accepted event
 
-	var correlationRecordToInsert = Struct.CorrelationTableRecord{CUSTOMER_ID: event.CustomerID, EVENT_ID: event.EventID}
+
 	var convertedNewDailyAmount = strconv.FormatFloat(newDailyLoadAmount, 'f', 2, 64)
 	var convertedNewDailyLoads = strconv.Itoa(newDailyLoads)
 	var loadRecordToInsert = Struct.LoadTableRecord{CUSTOMER_ID: event.CustomerID, DATE: extractedEventDate, DAILY_LOAD_AMOUNT: convertedNewDailyAmount, NUMBER_OF_LOADS: convertedNewDailyLoads}
 
-	InsertCorrelationTableRecord(dynamoDBClient, "EventCorrelationTable", correlationRecordToInsert)
+
 	InsertLoadTableRecord(dynamoDBClient, "DailyCustomerLoadTable", loadRecordToInsert)
 
 	log.Println(GenerateOutputRecord(event, true))

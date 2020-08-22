@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a52f9d93-cd28-4f63-b3ef-01affa5531ff" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Functions/ValidateEvent.go" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ValidateEvent.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dynamodb_local_latest/shared-local-instance.db" beforeDir="false" afterPath="$PROJECT_DIR$/dynamodb_local_latest/shared-local-instance.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
