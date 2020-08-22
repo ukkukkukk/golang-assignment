@@ -102,11 +102,9 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) {
 
 	//this is an accepted event
 
-
 	var convertedNewDailyAmount = strconv.FormatFloat(newDailyLoadAmount, 'f', 2, 64)
 	var convertedNewDailyLoads = strconv.Itoa(newDailyLoads)
 	var loadRecordToInsert = Struct.LoadTableRecord{CUSTOMER_ID: event.CustomerID, DATE: extractedEventDate, DAILY_LOAD_AMOUNT: convertedNewDailyAmount, NUMBER_OF_LOADS: convertedNewDailyLoads}
-
 
 	InsertLoadTableRecord(dynamoDBClient, "DailyCustomerLoadTable", loadRecordToInsert)
 

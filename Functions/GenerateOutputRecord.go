@@ -7,13 +7,13 @@ import (
 )
 
 func GenerateOutputRecord(event Struct.Event, accepted bool) string {
-	var rejectedOutput = Struct.OutputEvent{CustomerID: event.CustomerID, EventID: event.EventID, Accepted: accepted}
-	rejectedOutputJSON, jsonParseError := json.Marshal(rejectedOutput)
+	var outputRecord = Struct.OutputEvent{CustomerID: event.CustomerID, EventID: event.EventID, Accepted: accepted}
+	outputJSON, jsonParseError := json.Marshal(outputRecord)
 
 	if jsonParseError != nil {
 		log.Fatal(jsonParseError)
 		return ""
 	}
 
-	return string(rejectedOutputJSON)
+	return string(outputJSON)
 }
