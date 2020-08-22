@@ -7,21 +7,24 @@ import (
 	"log"
 )
 
-func QueryEventCorrelationTable(dynamoDBClient *dynamodb.DynamoDB, tableName string, hashKeyValue string, rangeKeyValue string) {
+func QueryCustomerLoadTable(dynamoDBClient *dynamodb.DynamoDB, tableName string, hashKeyValue string, rangeKeyValue1 string, rangeKeyValue2 string) {
 
 	var queryParam = &dynamodb.QueryInput{
 		TableName:              aws.String(tableName),
-		KeyConditionExpression: aws.String("#CUSTOMER_ID = :CUSTOMER_ID AND #EVENT_ID = :EVENT_ID"),
+		KeyConditionExpression: aws.String("#CUSTOMER_ID = :CUSTOMER_ID AND #DATE BETWEEN :START_DATE AND :END_DATE"),
 		ExpressionAttributeNames: map[string]*string{
 			"#CUSTOMER_ID": aws.String("CUSTOMER_ID"),
-			"#EVENT_ID":    aws.String("EVENT_ID"),
+			"#DATE":        aws.String("DATE"),
 		},
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":CUSTOMER_ID": {
 				S: aws.String(hashKeyValue),
 			},
-			":EVENT_ID": {
-				S: aws.String(rangeKeyValue),
+			":START_DATE": {
+				S: aws.String(rangeKeyValue1),
+			},
+			":END_DATE": {
+				S: aws.String(rangeKeyValue2),
 			},
 		},
 	}

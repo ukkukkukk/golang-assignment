@@ -53,6 +53,7 @@ func main() {
 			return
 		}
 		Functions.QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
+		Functions.QueryCustomerLoadTable(dynamoDBClient, "DailyCustomerLoadTable", event.CustomerID, event.EventTime, event.EventTime)
 
 		log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
 		linesProcessed++
