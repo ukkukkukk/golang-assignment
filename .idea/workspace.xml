@@ -20,11 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a52f9d93-cd28-4f63-b3ef-01affa5531ff" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Functions/FindStartOfWeek.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Functions/GenerateRejectedRecord.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Struct/LoadTableRecord.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/QueryCustomerLoadTable.go" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/QueryCustomerLoadTable.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Functions/ValidateEvent.go" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ValidateEvent.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/input.txt" beforeDir="false" afterPath="$PROJECT_DIR$/input.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
