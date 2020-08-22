@@ -2,13 +2,18 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"encoding/json"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"golang-assignment/Functions"
+	"golang-assignment/Struct"
 	"log"
 	"os"
 )
 
 func main() {
-	/*var awsConfig = aws.Config{
+	var awsConfig = aws.Config{
 		Region:   aws.String("us-east-2"),
 		Endpoint: aws.String("http://localhost:8000"),
 	}
@@ -21,7 +26,7 @@ func main() {
 	}
 
 	log.Printf("Creating DynamoDB Client. \n")
-	var dynamoDBClient = dynamodb.New(awsSession)*/
+	var dynamoDBClient = dynamodb.New(awsSession)
 
 	var fileName = "input.txt"
 
@@ -38,8 +43,19 @@ func main() {
 	var linesProcessed = 0
 
 	for fileScanner.Scan() {
-		fmt.Println(fileScanner.Text())
-		linesProcessed++;
+		var eventJSON = fileScanner.Text()
+		log.Printf(eventJSON)
+		var event Struct.Event
+		var jsonParseError = json.Unmarshal([]byte(eventJSON), &event)
+
+		if jsonParseError != nil {
+			log.Fatal(jsonParseError)
+			return
+		}
+		Functions.QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
+
+		log.Printf("Extracted JSON: %s %s %s %s \n", event.EventID, event.CustomerID, event.LoadAmount, event.EventTime)
+		linesProcessed++
 	}
 
 	log.Printf("Processed %d lines.\n", linesProcessed)
