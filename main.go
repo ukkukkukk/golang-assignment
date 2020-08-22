@@ -9,8 +9,12 @@ import (
 	"golang-assignment/Functions"
 	"golang-assignment/Struct"
 	"log"
+	"math/rand"
 	"os"
+	"strconv"
 )
+
+//before each run, both dynamodb tables should be deleted and recreated (to empty table)
 
 func main() {
 	var awsConfig = aws.Config{
@@ -38,7 +42,12 @@ func main() {
 		return
 	}
 
-	var outputFile, fileCreateError = os.Create("programOutput.txt")
+	var randomInt = rand.Int()
+
+	var outputFileName = "programOutput_" + strconv.Itoa(randomInt) + ".txt"
+	log.Printf("Writing to output file: %s \n", outputFileName)
+
+	var outputFile, fileCreateError = os.Create(outputFileName)
 	if fileCreateError != nil {
 		log.Fatal(fileCreateError)
 		return
