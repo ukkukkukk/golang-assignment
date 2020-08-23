@@ -28,7 +28,6 @@ func QueryEventCorrelationTable(dynamoDBClient *dynamodb.DynamoDB, tableName str
 	var queryResults, queryError = dynamoDBClient.Query(queryParam)
 	if queryError != nil {
 		log.Fatal(queryError)
-		return nil
 	}
 
 	return queryResults

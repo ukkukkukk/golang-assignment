@@ -26,7 +26,7 @@ func main() {
 
 	if sessionError != nil {
 		log.Fatal(sessionError)
-		return
+
 	}
 
 	log.Printf("Creating DynamoDB Client. \n")
@@ -39,7 +39,7 @@ func main() {
 	var inputFile, fileOpenError = os.Open(fileName)
 	if fileOpenError != nil {
 		log.Fatal(fileOpenError)
-		return
+
 	}
 
 	var randomInt = rand.Int()
@@ -50,7 +50,7 @@ func main() {
 	var outputFile, fileCreateError = os.Create(outputFileName)
 	if fileCreateError != nil {
 		log.Fatal(fileCreateError)
-		return
+
 	}
 
 	var fileScanner = bufio.NewScanner(inputFile)
@@ -65,7 +65,7 @@ func main() {
 
 		if jsonParseError != nil {
 			log.Fatal(jsonParseError)
-			return
+
 		}
 
 		var output = Functions.ValidateEvent(dynamoDBClient, event)
@@ -75,7 +75,7 @@ func main() {
 
 			if writeToFileError != nil {
 				log.Fatal(writeToFileError)
-				return
+
 			}
 		}
 
@@ -100,4 +100,6 @@ func main() {
 	if fileCloseError != nil {
 		log.Fatal(fileCloseError)
 	}
+
+	return
 }

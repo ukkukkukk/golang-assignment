@@ -14,7 +14,7 @@ func InsertCorrelationTableRecord(dynamoDBClient *dynamodb.DynamoDB, tableName s
 
 	if marshalError != nil {
 		log.Fatal(marshalError)
-		return
+
 	}
 
 	var putParam = &dynamodb.PutItemInput{
@@ -26,7 +26,7 @@ func InsertCorrelationTableRecord(dynamoDBClient *dynamodb.DynamoDB, tableName s
 
 	if err != nil {
 		log.Fatal(err)
-		return
+
 	}
 
 	return

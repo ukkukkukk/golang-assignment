@@ -12,7 +12,7 @@ func GenerateOutputRecord(event Struct.Event, accepted bool) string {
 
 	if jsonParseError != nil {
 		log.Fatal(jsonParseError)
-		return ""
+
 	}
 
 	return string(outputJSON)

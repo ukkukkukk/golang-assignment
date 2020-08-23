@@ -31,7 +31,7 @@ func QueryCustomerLoadTable(dynamoDBClient *dynamodb.DynamoDB, tableName string,
 	var queryResults, queryError = dynamoDBClient.Query(queryParam)
 	if queryError != nil {
 		log.Fatal(queryError)
-		return nil
+
 	}
 
 	return queryResults

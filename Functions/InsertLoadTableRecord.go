@@ -14,7 +14,7 @@ func InsertLoadTableRecord(dynamoDBClient *dynamodb.DynamoDB, tableName string, 
 
 	if marshalError != nil {
 		log.Fatal(marshalError)
-		return
+
 	}
 
 	var putParam = &dynamodb.PutItemInput{
@@ -26,7 +26,7 @@ func InsertLoadTableRecord(dynamoDBClient *dynamodb.DynamoDB, tableName string, 
 
 	if err != nil {
 		log.Fatal(err)
-		return
+
 	}
 
 	return

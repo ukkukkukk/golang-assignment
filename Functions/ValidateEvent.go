@@ -9,12 +9,14 @@ import (
 	"time"
 )
 
+const eventCorrelationTableName = "EventCorrelationTable"
+const dailyCustomerLoadTableName = "DailyCustomerLoadTable"
+
 func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string {
-	var correlationRecord = QueryEventCorrelationTable(dynamoDBClient, "EventCorrelationTable", event.CustomerID, event.EventID)
+	var correlationRecord = QueryEventCorrelationTable(dynamoDBClient, eventCorrelationTableName, event.CustomerID, event.EventID)
 
 	if correlationRecord == nil {
 		log.Fatal("Correlation query failed. ")
-		return ""
 	}
 
 	if *correlationRecord.Count > 0 {
@@ -23,7 +25,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 	}
 
 	var correlationRecordToInsert = Struct.CorrelationTableRecord{CUSTOMER_ID: event.CustomerID, EVENT_ID: event.EventID}
-	InsertCorrelationTableRecord(dynamoDBClient, "EventCorrelationTable", correlationRecordToInsert)
+	InsertCorrelationTableRecord(dynamoDBClient, eventCorrelationTableName, correlationRecordToInsert)
 
 	//extract date from dateTime
 	var layout = "2006-01-02T15:04:05Z"
@@ -31,7 +33,6 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 
 	if timestampParseError != nil {
 		log.Fatal(timestampParseError)
-		return ""
 	}
 
 	var extractedEventDate = eventTime.Format("2006-01-02")
@@ -40,11 +41,10 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 
 	var extractedStartOfWeek = FindStartOfWeek(eventTime)
 
-	var loadTableRecords = QueryCustomerLoadTable(dynamoDBClient, "DailyCustomerLoadTable", event.CustomerID, extractedStartOfWeek, extractedEventDate)
+	var loadTableRecords = QueryCustomerLoadTable(dynamoDBClient, dailyCustomerLoadTableName, event.CustomerID, extractedStartOfWeek, extractedEventDate)
 
 	if loadTableRecords == nil {
 		log.Fatal("Load  table query failed. ")
-		return ""
 	}
 
 	var currentAcceptedDailyLoadAmount = 0.0
@@ -59,14 +59,12 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 
 		if unmarshalError != nil {
 			log.Fatal(unmarshalError)
-			return ""
 		}
 
 		var dailyLoadAmount, parseError = strconv.ParseFloat(item.DAILY_LOAD_AMOUNT, 64)
 
 		if parseError != nil {
 			log.Fatal(parseError)
-			return ""
 		}
 
 		currentAcceptedWeeklyLoadAmount = currentAcceptedWeeklyLoadAmount + dailyLoadAmount
@@ -77,7 +75,6 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 			currentAcceptedDailyLoads, parseError = strconv.Atoi(item.NUMBER_OF_LOADS)
 			if parseError != nil {
 				log.Fatal(parseError)
-				return ""
 			}
 		}
 
@@ -87,7 +84,6 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 
 	if parseError != nil {
 		log.Fatal(parseError)
-		return ""
 	}
 
 	var newDailyLoadAmount = currentAcceptedDailyLoadAmount + eventLoadAmount
@@ -107,7 +103,7 @@ func ValidateEvent(dynamoDBClient *dynamodb.DynamoDB, event Struct.Event) string
 	var convertedNewDailyLoads = strconv.Itoa(newDailyLoads)
 	var loadRecordToInsert = Struct.LoadTableRecord{CUSTOMER_ID: event.CustomerID, DATE: extractedEventDate, DAILY_LOAD_AMOUNT: convertedNewDailyAmount, NUMBER_OF_LOADS: convertedNewDailyLoads}
 
-	InsertLoadTableRecord(dynamoDBClient, "DailyCustomerLoadTable", loadRecordToInsert)
+	InsertLoadTableRecord(dynamoDBClient, dailyCustomerLoadTableName, loadRecordToInsert)
 
 	var outputRecord = GenerateOutputRecord(event, true)
 	log.Println(outputRecord)
